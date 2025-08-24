@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saba | Personal Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Light Theme Colors */
+        :root {
+            --bg-primary: #f1f5f9; /* slate-100 */
+            --bg-secondary: rgba(255, 255, 255, 0.6); /* white with opacity */
+            --text-primary: #0f172a; /* slate-900 */
+            --text-secondary: #475569; /* slate-600 */
+            --accent-color: #2563eb; /* blue-600 */
+            --accent-hover: #1d4ed8; /* blue-700 */
+            --border-color: rgba(226, 232, 240, 0.8); /* slate-200 with opacity */
+        }
+        /* Dark Theme Colors */
+        .dark {
+            --bg-primary: #0f172a; /* slate-900 */
+            --bg-secondary: rgba(30, 41, 59, 0.5); /* slate-800 with opacity */
+            --text-primary: #f8fafc; /* slate-50 */
+            --text-secondary: #cbd5e1; /* slate-300 */
+            --accent-color: #60a5fa; /* blue-400 */
+            --accent-hover: #3b82f6; /* blue-500 */
+            --border-color: rgba(51, 65, 85, 0.8); /* slate-700 with opacity */
+        }
+        /* Applying colors using CSS variables */
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.5s, color 0.5s;
+        }
+        .bg-secondary { 
+            background-color: var(--bg-secondary);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .text-secondary { color: var(--text-secondary); }
+        .accent { color: var(--accent-color); }
+        .border-custom { border-color: var(--border-color); }
+        .hover-accent:hover { color: var(--accent-color); }
+        .button-accent {
+             background-color: var(--accent-color);
+             transition: background-color 0.3s;
+        }
+        .button-accent:hover {
+            background-color: var(--accent-hover);
+        }
+
+        /* Background Gradient Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 100vw;
+            z-index: -1;
+            background: radial-gradient(circle at 15% 50%, var(--accent-color), transparent 25%),
+                        radial-gradient(circle at 85% 30%, #34d399, transparent 25%);
+            opacity: 0.15;
+            filter: blur(100px);
+            transition: background 0.5s;
+        }
+        .dark body::before {
+             background: radial-gradient(circle at 15% 50%, var(--accent-color), transparent 30%),
+                        radial-gradient(circle at 85% 30%, #34d399, transparent 30%);
+        }
+
+        /* Scroll Animation */
+        .scroll-animate {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.165, 0.84, 0.44, 1), transform 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .scroll-animate.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Loader for Gemini API */
+        .loader {
+            width: 24px;
+            height: 24px;
+            border: 3px solid var(--accent-color);
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Blinking Cursor for Typewriter Effect */
+        .blinking-cursor {
+            font-weight: 600;
+            color: var(--accent-color);
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            from, to { color: transparent; }
+            50% { color: var(--accent-color); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header -->
+    <header id="header" class="fixed top-0 left-0 right-0 z-50 bg-secondary border-b border-custom transition-all duration-300">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold accent tracking-tight">Saba.</a>
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#about" class="text-secondary hover-accent transition-colors">About</a>
+                <a href="#skills" class="text-secondary hover-accent transition-colors">Skills</a>
+                <a href="#ai-helper" class="text-secondary hover-accent transition-colors">AI Helper</a>
+                <a href="#experience" class="text-secondary hover-accent transition-colors">Experience</a>
+                <a href="#education" class="text-secondary hover-accent transition-colors">Education</a>
+                <a href="#contact" class="text-secondary hover-accent transition-colors">Contact</a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-full text-secondary hover-accent focus:outline-none transition-colors">
+                    <svg id="theme-icon-light" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="theme-icon-dark" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-secondary focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#about" class="block py-2 text-secondary hover-accent">About</a>
+            <a href="#skills" class="block py-2 text-secondary hover-accent">Skills</a>
+            <a href="#ai-helper" class="block py-2 text-secondary hover-accent">AI Helper</a>
+            <a href="#experience" class="block py-2 text-secondary hover-accent">Experience</a>
+            <a href="#education" class="block py-2 text-secondary hover-accent">Education</a>
+            <a href="#contact" class="block py-2 text-secondary hover-accent">Contact</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 pt-24 md:pt-32">
+        <!-- Hero Section -->
+        <section id="home" class="min-h-[80vh] flex flex-col-reverse md:flex-row items-center justify-center text-center md:text-left">
+            <div class="md:w-1/2 mb-10 md:mb-0 scroll-animate">
+                <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">Hi, I'm <span class="accent">Saba</span></h1>
+                <p class="text-lg md:text-xl text-secondary mb-8 max-w-xl mx-auto md:mx-0">A future-focused science educator blending 4 years of teaching experience with a passion for AI-driven learning.</p>
+                <a href="#contact" class="button-accent text-white font-bold py-3 px-8 rounded-lg hover:shadow-lg transform hover:-translate-y-1 transition-all">Get In Touch</a>
+            </div>
+            <div class="md:w-1/2 flex justify-center scroll-animate" style="transition-delay: 200ms;">
+                <div class="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shadow-2xl border-4 border-custom relative">
+                    <img src="http://googleusercontent.com/file_content/0" alt="Saba" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='https://placehold.co/320x320/e2e8f0/4a5568?text=Saba';">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20 scroll-animate">
+            <h2 class="text-3xl font-bold text-center mb-12">About Me</h2>
+            <div class="max-w-3xl mx-auto bg-secondary p-8 rounded-lg shadow-lg border border-custom">
+                <p class="text-secondary leading-relaxed text-center text-lg">
+                    I am a goal-oriented educator with a Master's in Chemistry and a B.Ed, adept at creating engaging learning environments. My objective is to leverage my skills and knowledge to perform a creative and impactful role, contributing to student success. I am fluent in English, Hindi, and Urdu.
+                </p>
+            </div>
+        </section>
+
+        <!-- AI in Education Section -->
+        <section id="skills" class="py-20">
+            <h2 class="text-3xl font-bold text-center mb-4 scroll-animate">A Smart Teacher for a Smarter Future</h2>
+            <p class="text-center text-secondary mb-12 max-w-2xl mx-auto scroll-animate" style="transition-delay: 150ms;">I believe in integrating modern technology to create personalized and effective learning experiences.</p>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Python Card -->
+                <div class="bg-secondary p-8 rounded-lg shadow-lg border border-custom text-center scroll-animate" style="transition-delay: 200ms;">
+                    <div class="flex justify-center mb-4"><i data-lucide="code-2" class="w-12 h-12 accent"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Python Programming</h3>
+                    <p class="text-secondary">Completed comprehensive coursework in Python, enabling me to develop custom scripts and tools to aid in teaching and data analysis.</p>
+                </div>
+                <!-- AI Algorithms Card -->
+                <div class="bg-secondary p-8 rounded-lg shadow-lg border border-custom text-center scroll-animate" style="transition-delay: 350ms;">
+                    <div class="flex justify-center mb-4"><i data-lucide="brain-circuit" class="w-12 h-12 accent"></i></div>
+                    <h3 class="text-xl font-bold mb-2">AI Algorithm Knowledge</h3>
+                    <p class="text-secondary">Familiar with core AI algorithms, allowing me to understand and apply intelligent systems for educational purposes.</p>
+                </div>
+                <!-- GenAI Card -->
+                <div class="bg-secondary p-8 rounded-lg shadow-lg border border-custom text-center scroll-animate" style="transition-delay: 500ms;">
+                    <div class="flex justify-center mb-4"><i data-lucide="sparkles" class="w-12 h-12 accent"></i></div>
+                    <h3 class="text-xl font-bold mb-2">Generative AI in Teaching</h3>
+                    <p class="text-secondary">Utilizing GenAI to create dynamic lesson plans, generate unique problem sets, and offer personalized feedback to students at scale.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI-Powered Lesson Helper Section -->
+        <section id="ai-helper" class="py-20">
+            <h2 class="text-3xl font-bold text-center mb-4 scroll-animate">AI-Powered Lesson Helper</h2>
+            <p class="text-center text-secondary mb-12 max-w-2xl mx-auto scroll-animate" style="transition-delay: 150ms;">
+                Curious about a science topic? Enter it below and get a simple, student-friendly explanation generated by AI.
+            </p>
+            <div class="max-w-2xl mx-auto bg-secondary p-8 rounded-lg shadow-lg border border-custom scroll-animate" style="transition-delay: 300ms;">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <input type="text" id="topic-input" placeholder="E.g., 'Photosynthesis' or 'Newton's First Law'" class="w-full px-4 py-3 bg-transparent border-2 border-custom rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-shadow">
+                    <button id="generate-btn" class="button-accent text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center w-full sm:w-auto shrink-0">
+                        <span id="btn-text">✨ Generate Explanation</span>
+                        <span id="btn-loader" class="hidden loader"></span>
+                    </button>
+                </div>
+                <div id="explanation-output" class="mt-6 p-6 bg-primary rounded-lg border border-custom min-h-[100px] text-secondary leading-relaxed" style="display: none;"></div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="py-20">
+            <h2 class="text-3xl font-bold text-center mb-12 scroll-animate">Professional Experience</h2>
+            <div class="max-w-3xl mx-auto space-y-8">
+                 <!-- Aakash Institute -->
+                <div class="bg-secondary p-8 rounded-lg shadow-lg border border-custom scroll-animate">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+                        <h3 class="text-xl font-bold accent">Faculty</h3>
+                        <span class="text-sm text-secondary mt-1 sm:mt-0">June 2025 - Present</span>
+                    </div>
+                    <p class="text-secondary font-medium mb-4">Aakash Institute</p>
+                    <ul class="list-disc list-inside text-secondary space-y-2">
+                        <li>Delivering high-quality science education to competitive exam aspirants.</li>
+                        <li>Developing and implementing AI-powered tools for student assessment.</li>
+                    </ul>
+                </div>
+                <!-- Previous Experience -->
+                <div class="bg-secondary p-8 rounded-lg shadow-lg border border-custom scroll-animate">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2">
+                        <h3 class="text-xl font-bold accent">Trained Graduate Teacher (Science)</h3>
+                         <span class="text-sm text-secondary mt-1 sm:mt-0">4 Years of Total Experience</span>
+                    </div>
+                     <p class="text-secondary font-medium mb-4">Previous Roles</p>
+                    <ul class="list-disc list-inside text-secondary space-y-2">
+                        <li>Developed engaging lesson plans in Physics, Chemistry, and Biology.</li>
+                        <li>Conducted practical laboratory experiments to enhance understanding.</li>
+                        <li>Fostered a positive and inclusive classroom environment.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="py-20">
+            <h2 class="text-3xl font-bold text-center mb-12 scroll-animate">My Education</h2>
+            <div class="relative max-w-4xl mx-auto">
+                <div class="absolute left-1/2 top-0 h-full w-0.5 bg-gray-300 dark:bg-gray-600 hidden md:block"></div>
+                <div class="space-y-12">
+                    <!-- Education items here... -->
+                    <div class="flex flex-col md:flex-row items-center scroll-animate">
+                        <div class="md:w-1/2 md:pr-8 md:text-right">
+                            <p class="font-bold text-lg accent">Bachelor of Education (B.Ed)</p>
+                            <p class="text-secondary">Binod Bihari Mahto Koylanchal University, Dhanbad</p>
+                            <p class="text-sm text-secondary">2023 | 81.76%</p>
+                        </div>
+                        <div class="hidden md:block w-8 h-8 rounded-full bg-secondary border-2 border-custom flex-shrink-0"></div>
+                        <div class="md:w-1/2 md:pl-8 mt-4 md:mt-0"></div>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center scroll-animate">
+                        <div class="md:w-1/2 md:pr-8 md:text-right mt-4 md:mt-0 order-1 md:order-2">
+                            <p class="font-bold text-lg accent">M.Sc (Chemistry)</p>
+                            <p class="text-secondary">Mahatma Gandhi Kashi Vidyapith, Varanasi</p>
+                            <p class="text-sm text-secondary">2020 | 67.7%</p>
+                        </div>
+                        <div class="hidden md:block w-8 h-8 rounded-full bg-secondary border-2 border-custom flex-shrink-0 order-2 md:order-1"></div>
+                        <div class="md:w-1/2 md:pl-8 order-3 md:order-3"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20">
+            <h2 class="text-3xl font-bold text-center mb-4 scroll-animate">Contact Me</h2>
+            <p class="text-center text-secondary mb-12 scroll-animate">Feel free to reach out for any opportunities or inquiries.</p>
+            <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-10">
+                <div class="bg-secondary p-8 rounded-lg shadow-lg border border-custom scroll-animate">
+                    <h3 class="text-xl font-bold mb-6">Contact Information</h3>
+                    <div class="space-y-6">
+                        <div class="flex items-center">
+                            <i data-lucide="mail" class="w-6 h-6 mr-4 accent"></i>
+                            <a href="mailto:saba4086khan@gmail.com" class="text-secondary hover-accent">saba4086khan@gmail.com</a>
+                        </div>
+                        <div class="flex items-center">
+                            <i data-lucide="phone" class="w-6 h-6 mr-4 accent"></i>
+                            <a href="tel:+918797945101" class="text-secondary hover-accent">+91 87979 45101</a>
+                        </div>
+                        <div class="flex items-start">
+                            <i data-lucide="map-pin" class="w-6 h-6 mr-4 mt-1 accent flex-shrink-0"></i>
+                            <p class="text-secondary">Dhanbad, Jharkhand, India - 828301</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-secondary p-8 rounded-lg shadow-lg border border-custom scroll-animate" style="transition-delay: 200ms;">
+                     <h3 class="text-xl font-bold mb-6">Send a Message</h3>
+                     <form action="#" method="POST">
+                         <div class="mb-4">
+                             <label for="name" class="block text-secondary text-sm font-medium mb-2">Your Name</label>
+                             <input type="text" id="name" name="name" class="w-full px-4 py-2 bg-transparent border border-custom rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-shadow">
+                         </div>
+                         <div class="mb-4">
+                             <label for="email" class="block text-secondary text-sm font-medium mb-2">Your Email</label>
+                             <input type="email" id="email" name="email" class="w-full px-4 py-2 bg-transparent border border-custom rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-shadow">
+                         </div>
+                         <div class="mb-6">
+                             <label for="message" class="block text-secondary text-sm font-medium mb-2">Message</label>
+                             <textarea id="message" name="message" rows="4" class="w-full px-4 py-2 bg-transparent border border-custom rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 transition-shadow"></textarea>
+                         </div>
+                         <button type="submit" class="w-full button-accent text-white font-bold py-3 px-6 rounded-lg hover:shadow-lg transform hover:-translate-y-0.5 transition-all">
+                             Send
+                         </button>
+                     </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-custom mt-16">
+        <div class="container mx-auto px-6 py-6 text-center text-secondary">
+            <p>&copy; 2025 Saba. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Theme Toggler
+        const themeToggle = document.getElementById('theme-toggle');
+        const htmlEl = document.documentElement;
+        const lightIcon = document.getElementById('theme-icon-light');
+        const darkIcon = document.getElementById('theme-icon-dark');
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            htmlEl.classList.add('dark');
+            darkIcon.classList.remove('hidden');
+        } else {
+            lightIcon.classList.remove('hidden');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            htmlEl.classList.toggle('dark');
+            lightIcon.classList.toggle('hidden');
+            darkIcon.classList.toggle('hidden');
+            if (htmlEl.classList.contains('dark')) {
+                localStorage.setItem('theme', 'dark');
+            } else {
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Mobile Menu
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        document.querySelectorAll('#mobile-menu a, #mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // Scroll Animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.scroll-animate').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Gemini API Integration with Typewriter Effect
+        const generateBtn = document.getElementById('generate-btn');
+        const topicInput = document.getElementById('topic-input');
+        const explanationOutput = document.getElementById('explanation-output');
+        const btnText = document.getElementById('btn-text');
+        const btnLoader = document.getElementById('btn-loader');
+        let typeInterval;
+
+        generateBtn.addEventListener('click', async () => {
+            const topic = topicInput.value.trim();
+            if (!topic) {
+                explanationOutput.style.display = 'block';
+                explanationOutput.textContent = 'Please enter a topic.';
+                return;
+            }
+
+            // Clear previous interval if it exists
+            if (typeInterval) clearInterval(typeInterval);
+
+            // Show loader and disable button
+            btnText.classList.add('hidden');
+            btnLoader.classList.remove('hidden');
+            generateBtn.disabled = true;
+
+            // Setup output area for typewriter
+            explanationOutput.style.display = 'block';
+            explanationOutput.innerHTML = '<span id="text-content"></span><span id="cursor" class="blinking-cursor">▋</span>';
+            const textContentEl = document.getElementById('text-content');
+            const cursorEl = document.getElementById('cursor');
+            
+            let textQueue = [];
+            let streamingComplete = false;
+
+            // Start the typewriter effect
+            typeInterval = setInterval(() => {
+                if (textQueue.length > 0) {
+                    textContentEl.textContent += textQueue.shift();
+                } else if (streamingComplete) {
+                    clearInterval(typeInterval);
+                    if(cursorEl) cursorEl.style.display = 'none'; // Hide cursor when done
+                }
+            }, 25); // Adjust typing speed (milliseconds)
+
+            const prompt = `Explain the science topic "${topic}" in a simple and concise way, as if you were explaining it to a high school student. Use analogies if helpful.`;
+
+            try {
+                let chatHistory = [];
+                chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+                const payload = { contents: chatHistory };
+                const apiKey = ""; // API key will be handled by the environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:streamGenerateContent?key=${apiKey}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        streamingComplete = true;
+                        break;
+                    }
+
+                    buffer += decoder.decode(value, { stream: true });
+                    // The response is a stream of JSON chunks, sometimes multiple per packet.
+                    // We need to handle this by splitting on newlines.
+                    const lines = buffer.split('\n');
+                    buffer = lines.pop(); // Keep the last, possibly incomplete, line for the next iteration
+
+                    for (const line of lines) {
+                        // Skip empty lines and the initial `[` or final `]`
+                        if (line.trim().length === 0 || line.trim() === '[' || line.trim() === ']') continue;
+                        
+                        // Clean up the line to be valid JSON
+                        let cleanedLine = line.replace('data: ', '').trim();
+                        if (cleanedLine.endsWith(',')) {
+                            cleanedLine = cleanedLine.slice(0, -1);
+                        }
+
+                        if (cleanedLine) {
+                            try {
+                                const json = JSON.parse(cleanedLine);
+                                const text = json.candidates?.[0]?.content?.parts?.[0]?.text;
+                                if (text) {
+                                    textQueue.push(...text.split(''));
+                                }
+                            } catch (e) {
+                                console.warn("Could not parse JSON chunk:", cleanedLine);
+                            }
+                        }
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                textContentEl.textContent = 'An error occurred. Please try again later.';
+                streamingComplete = true; // Ensure the interval stops on error
+            } finally {
+                // Re-enable button
+                btnText.classList.remove('hidden');
+                btnLoader.classList.add('hidden');
+                generateBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
